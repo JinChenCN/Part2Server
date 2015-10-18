@@ -11,7 +11,7 @@ import org.restlet.data.Protocol;
 public class Server {
 	static Integer port = 8085;
 	static String filePath = "";
-	static String segmentPath = "";
+	static String segmentPath = "711ServerSegFolder";
 	static File[] listOfFiles = null;
 	static List<String> CachedSegementList = new ArrayList<String>();
 	
@@ -22,6 +22,13 @@ public class Server {
     	
 		// Initiate saved segments
 		File segfolder = new File(segmentPath);
+		try {
+			   if (!(segfolder.isDirectory())) {
+			    new File(segmentPath).mkdir();
+			   }
+			  } catch (SecurityException e) {
+			   e.printStackTrace();
+			  }
 		if(segfolder.listFiles()!=null)
 		{
 			for(File seg : segfolder.listFiles()) {
@@ -52,7 +59,6 @@ public class Server {
 			file.close();
 			port = Integer.parseInt(configFile.getProperty("ServerPort"));
 			filePath = configFile.getProperty("SeverFilePath");
-			segmentPath = configFile.getProperty("SeverSegPath");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
