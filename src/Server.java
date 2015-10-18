@@ -22,9 +22,12 @@ public class Server {
     	
 		// Initiate saved segments
 		File segfolder = new File(segmentPath);
-		for(File seg : segfolder.listFiles()) {
-			 seg.delete();               
-	        }	
+		if(segfolder.listFiles()!=null)
+		{
+			for(File seg : segfolder.listFiles()) {
+				 seg.delete();               
+		        }
+		}	
     	
 	    // Create a new Component.  
 	    Component component = new Component(); 
