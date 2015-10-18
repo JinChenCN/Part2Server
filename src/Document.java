@@ -19,6 +19,7 @@ import org.restlet.resource.ServerResource;
 
 public class Document extends ServerResource {
 	String segmentName = "";
+	String prefix= "";
 	int hconst = 69069; // good hash multiplier for MOD 2^32
 	int mult = 1; // this will hold the p^n value
 	int[] buffer; // circular buffer - reading from file stream
@@ -44,6 +45,8 @@ public class Document extends ServerResource {
 		{
 			fileName += form.getValues("fileName");
 		}
+		
+		prefix=fileName.substring(fileName.lastIndexOf(".")+1);
 
 		File f = new File(Server.filePath + "//" + fileName);
 		FileInputStream fs;
@@ -62,16 +65,16 @@ public class Document extends ServerResource {
 			out.close();
 			if(!segments.contains(segNameInit))
 			{
-				File temp = new File(Server.segmentPath + "//out.txt");
-				File segmentInit = new File(Server.segmentPath + "//" + segNameInit + ".txt");
+				File temp = new File(Server.segmentPath + "//out." + prefix);
+				File segmentInit = new File(Server.segmentPath + "//" + segNameInit + "." + prefix);
 				temp.renameTo(segmentInit);
 				segments.add(segNameInit);										
 			}
 			JSONObject segmentJson = new JSONObject() ; 
-			segmentJson.put("name", segNameInit+".txt");
+			segmentJson.put("name", segNameInit+"." + prefix);
 			if(!Server.CachedSegementList.contains(segNameInit))
 			{
-				segmentJson.put("content", Files.readAllBytes(new File(Server.segmentPath + "//" + segNameInit + ".txt").toPath()));
+				segmentJson.put("content", Files.readAllBytes(new File(Server.segmentPath + "//" + segNameInit + "." + prefix).toPath()));
 				Server.CachedSegementList.add(segNameInit);	
 			}
 			else
@@ -80,7 +83,7 @@ public class Document extends ServerResource {
 			}
 			list.put(segmentJson);
 			
-			out = new FileOutputStream(Server.segmentPath + "//out.txt");
+			out = new FileOutputStream(Server.segmentPath + "//out." + prefix);
 			////////////////////////////////////
 			
 			curr -= bis.available();
@@ -91,16 +94,16 @@ public class Document extends ServerResource {
 				out.close();
 				if(!segments.contains(segName))
 				{
-					File temp = new File(Server.segmentPath + "//out.txt");
-					File segment = new File(Server.segmentPath + "//" + segName + ".txt");
+					File temp = new File(Server.segmentPath + "//out." + prefix);
+					File segment = new File(Server.segmentPath + "//" + segName + "." + prefix);
 					temp.renameTo(segment);
 					segments.add(segName);										
 				}
 				JSONObject segment = new JSONObject() ; 
-				segment.put("name", segName+".txt");
+				segment.put("name", segName+ "." + prefix);
 				if(!Server.CachedSegementList.contains(segName))
 				{
-					segment.put("content", Files.readAllBytes(new File(Server.segmentPath + "//" + segName + ".txt").toPath()));
+					segment.put("content", Files.readAllBytes(new File(Server.segmentPath + "//" + segName + "." + prefix).toPath()));
 					Server.CachedSegementList.add(segName);	
 				}
 				else
@@ -110,7 +113,7 @@ public class Document extends ServerResource {
 				list.put(segment);
 				
 
-				out = new FileOutputStream(Server.segmentPath + "//out.txt");
+				out = new FileOutputStream(Server.segmentPath + "//out." + prefix);
 			}
 			// next window's hash  //
 			hash = nexthash(hash);
@@ -124,8 +127,8 @@ public class Document extends ServerResource {
 				out.close();
 				if(!segments.contains(segName))
 				{
-					File temp = new File(Server.segmentPath + "//out.txt");
-					File segment = new File(Server.segmentPath + "//" + segName + ".txt");
+					File temp = new File(Server.segmentPath + "//out." + prefix);
+					File segment = new File(Server.segmentPath + "//" + segName + "." + prefix);
 					temp.renameTo(segment);
 					segments.add(segName);										
 				}
@@ -134,7 +137,7 @@ public class Document extends ServerResource {
 				segment.put("name", segName+".txt");
 				if(!Server.CachedSegementList.contains(segName))
 				{
-					segment.put("content", Files.readAllBytes(new File(Server.segmentPath + "//" + segName + ".txt").toPath()));
+					segment.put("content", Files.readAllBytes(new File(Server.segmentPath + "//" + segName + "." + prefix).toPath()));
 					Server.CachedSegementList.add(segName);	
 				}
 				else
@@ -170,7 +173,7 @@ public class Document extends ServerResource {
 	
 	private int inithash(int from, int to) throws IOException {
 		buffer = new int[from - to + 1]; // create circular buffer
-		out = new FileOutputStream(Server.segmentPath + "//out.txt");
+		out = new FileOutputStream(Server.segmentPath + "//out." + prefix);
 		
 		int hash = 0;
 		
